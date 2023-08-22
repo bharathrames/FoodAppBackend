@@ -7,8 +7,10 @@ global.foodData = require('./db')(function call(err, data, CatData) {
   })
   
   const express = require('express')
+  var cors = require('cors')
   const app = express()
   const port = 5000
+  app.use(cors())
   app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "https://recepieappes.netlify.app");
     res.header(
