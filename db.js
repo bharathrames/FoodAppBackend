@@ -1,45 +1,34 @@
-const mongoose = require('mongoose')
-// const mongoDbClient = require("mongodb").MongoClient
-const mongoURI = 'mongodb+srv://bharath91505:bharath123@cluster10.osghaom.mongodb.net/?retryWrites=true&w=majority' // Customer change url to your db you created in atlas
-// mongodb://<username>:<password>@merncluster-shard-00-00.d1d4z.mongodb.net:27017,merncluster-shard-00-01.d1d4z.mongodb.net:27017,merncluster-shard-00-02.d1d4z.mongodb.net:27017/?ssl=true&replicaSet=atlas-eusy5p-shard-0&authSource=admin&retryWrites=true&w=majority
-// module.exports = function (callback) {
-//     mongoose.connect(mongoURI, { useNewUrlParser: true }, async (err, result) => {
-//         // mongoDbClient.connect(mongoURI, { useNewUrlParser: true }, async(err, result) => {
-//         if (err) console.log("---" + err)
-//         else {
-//             // var database =
-//             console.log("connected to mongo")
-//             const foodCollection = await mongoose.connection.db.collection("food_items");
-//             foodCollection.find({}).toArray(async function (err, data) {
+const mongoose = require('mongoose');
 
-//                 const categoryCollection = await mongoose.connection.db.collection("Categories");
-//                 categoryCollection.find({}).toArray(async function (err, Catdata) {
-//                     callback(err, data, Catdata);
+// Use environment variables for sensitive information
+const mongoURI = 'mongodb+srv://bharath91505:bharath123@cluster10.osghaom.mongodb.net/?retryWrites=true&w=majority; // Set this in your environment'
 
-//                 })
-//             });
-//             // listCollections({name: 'food_items'}).toArray(function (err, database) {
-//             // });
-//             //     module.exports.Collection = database;
-//             // });
-//         }
-//     })
-// };
+// Create a separate connection function to handle the async/await syntax
+async function connectToDatabase() {
+    try {
+        await mongoose.connect(mongoURI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+
+        console.log('Connected to MongoDB');
+    } catch (error) {
+        console.error('Error connecting to MongoDB:', error);
+    }
+}
 
 module.exports = async function (callback) {
     try {
-        await mongoose.connect(mongoURI, { useNewUrlParser: true });
-        console.log("Connected to MongoDB");
+        await connectToDatabase();
 
-        const foodCollection = await mongoose.connection.db.collection("food_items");
+        const foodCollection = mongoose.connection.collection('food_items');
         const data = await foodCollection.find({}).toArray();
 
-        const categoryCollection = await mongoose.connection.db.collection("Categories");
+        const categoryCollection = mongoose.connection.collection('Categories');
         const Catdata = await categoryCollection.find({}).toArray();
 
         callback(null, data, Catdata);
-    } catch (err) {
-        console.error("An error occurred:", err);
-        callback(err, null, null);
+    } catch (error) {
+        callback(error, null, null);
     }
 };
